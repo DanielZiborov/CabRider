@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "826835029140",
+    "project_id": "geetaxi-fc253",
+    "storage_bucket": "geetaxi-fc253.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:826835029140:android:d2436251c930b65866f881",
+        "android_client_info": {
+          "package_name": "com.example.cab_rider"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmFz9_dkbCI5kt7T1Y6Fg8QO0bIIIH0Xw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
