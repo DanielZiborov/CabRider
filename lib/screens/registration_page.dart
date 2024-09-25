@@ -1,33 +1,48 @@
+import 'dart:developer';
 import 'package:cab_rider/brand_colors.dart';
 import 'package:cab_rider/screens/login_page.dart';
 import 'package:cab_rider/widgets/taxi_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class RegistrationPage extends StatefulWidget {
-  const RegistrationPage({super.key});
+class RegistrationPage extends StatelessWidget {
+  RegistrationPage({super.key});
 
   static const id = 'register';
 
-  @override
-  State<RegistrationPage> createState() => _RegistrationPageState();
-}
+  final fullNameController = TextEditingController();
 
-class _RegistrationPageState extends State<RegistrationPage> {
-  var fullNameController = TextEditingController();
+  final emailController = TextEditingController();
 
-  var emailController = TextEditingController();
+  final phoneController = TextEditingController();
 
-  var phoneController = TextEditingController();
-
-  var passwordController = TextEditingController();
-
-  final _auth = FirebaseAuth.instance;
+  final passwordController = TextEditingController();
 
   void registerUser() async {
-    await _auth.createUserWithEmailAndPassword(
+    final user = (await FirebaseAuth.instance.createUserWithEmailAndPassword(
       email: emailController.text,
       password: passwordController.text,
+    ))
+        .user;
+    if (user != null) {
+      log("ERROR");
+    } else {
+      log("Success");
+    }
+  }
+
+  void showError(BuildContext context, String title) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          title,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 15,
+            color: Colors.red,
+          ),
+        ),
+      ),
     );
   }
 
@@ -131,7 +146,33 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       TaxiButton(
                         title: 'REGISTER',
                         color: BrandColors.colorGreen,
-                        onPressed: registerUser,
+                        onPressed: () {
+                          if (fullNameController.text.length < 3) {
+                            showError(context, "Invalid  Full Name");
+                            return;
+                          }
+                          if (phoneController.text.length < 10) {
+                            showError(context, "Invalid Phone Number");
+                            return;
+                          }
+                          if (passwordController.text.length < 8) {
+                            showError(
+                              context,
+                              "Password must be at least 8 characters long.",
+                            );
+                            return;
+                          }
+                          if (!emailController.text.contains('@')) {
+                            showError(context, "Invalid email");
+                            return;
+                          }
+
+                          try {
+                            registerUser();
+                          } catch (e) {
+                            showError(context,"ERROR");
+                          }
+                        },
                       ),
                     ],
                   ),
