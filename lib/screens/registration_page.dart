@@ -1,15 +1,25 @@
-import 'dart:developer';
 import 'package:cab_rider/brand_colors.dart';
 import 'package:cab_rider/screens/login_page.dart';
+import 'package:cab_rider/screens/main_page.dart';
 import 'package:cab_rider/widgets/taxi_button.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class RegistrationPage extends StatelessWidget {
-  RegistrationPage({super.key});
+final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+class RegistrationPage extends StatefulWidget {
+  const RegistrationPage({super.key});
 
   static const id = 'register';
 
+  @override
+  State<RegistrationPage> createState() => _RegistrationPageState();
+}
+
+class _RegistrationPageState extends State<RegistrationPage> {
   final fullNameController = TextEditingController();
 
   final emailController = TextEditingController();
@@ -18,20 +28,43 @@ class RegistrationPage extends StatelessWidget {
 
   final passwordController = TextEditingController();
 
+  final _auth = FirebaseAuth.instance;
+
+  final user = null;
+
   void registerUser() async {
-    try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
-      );
-      log("SUCCESS");
-    } catch (e) {
-      log("ERROR");
+    final user = (await _auth
+            .createUserWithEmailAndPassword(
+      email: emailController.text,
+      password: passwordController.text,
+    )
+            .catchError((ex) {
+      //check errors and display messages
+
+      PlatformException thisEx = ex;
+      showError(thisEx.message.toString());
+    }))
+        .user;
+
+    if (user != null) {
+      DatabaseReference newUserRef =
+          FirebaseDatabase.instance.ref().child('users/${user.uid}');
+      Map userMap = {
+        "fullName": fullNameController.text,
+        "email": emailController.text,
+        "phone": phoneController.text,
+      };
+      newUserRef.set(userMap);
+      transitionMainPage();
     }
   }
 
-  void showError(BuildContext context, String title) {
-    ScaffoldMessenger.of(context).showSnackBar(
+  void transitionMainPage() {
+    Navigator.pushNamedAndRemoveUntil(context, MainPage.id, (route) => false);
+  }
+
+  void showError(String title) {
+    ScaffoldMessenger.of(_scaffoldKey.currentState!.context).showSnackBar(
       SnackBar(
         content: Text(
           title,
@@ -48,6 +81,7 @@ class RegistrationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -145,26 +179,41 @@ class RegistrationPage extends StatelessWidget {
                       TaxiButton(
                         title: 'REGISTER',
                         color: BrandColors.colorGreen,
-                        onPressed: () {
+                        onPressed: () async {
+                          //check network
+
+                          var connectivityResult =
+                              await Connectivity().checkConnectivity();
+
+                          if (connectivityResult
+                                  .contains(ConnectivityResult.mobile) ||
+                              connectivityResult
+                                  .contains(ConnectivityResult.wifi)) {
+                                    showError("no internet connectivity");
+                                    return;
+                                  }
+
+                          //check my problems
                           if (fullNameController.text.length < 3) {
-                            showError(context, "Invalid  Full Name");
+                            showError("Invalid  Full Name");
                             return;
                           }
                           if (phoneController.text.length < 10) {
-                            showError(context, "Invalid Phone Number");
+                            showError("Invalid Phone Number");
                             return;
                           }
                           if (passwordController.text.length < 8) {
                             showError(
-                              context,
-                              "Password must be at least 8 characters long.",
+                              "Password must be at least 8 characters long",
                             );
                             return;
                           }
                           if (!emailController.text.contains('@')) {
-                            showError(context, "Invalid email");
+                            showError("Invalid email");
                             return;
                           }
+
+                          //registration
                           registerUser();
                         },
                       ),

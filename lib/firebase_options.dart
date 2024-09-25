@@ -50,7 +50,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: '',
+    apiKey: 'AIzaSyDmFz9_dkbCI5kt7T1Y6Fg8QO0bIIIH0Xw',
     appId: '1:826835029140:android:d2436251c930b65866f881',
     messagingSenderId: '826835029140',
     projectId: 'geetaxi-fc253',
@@ -58,7 +58,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: '',
+    apiKey: 'AIzaSyDIzV4S2rCwpRXZldar-P1oGz9IrV8ccOw',
     appId: '1:826835029140:ios:8dbaee96889b491766f881',
     messagingSenderId: '826835029140',
     projectId: 'geetaxi-fc253',
