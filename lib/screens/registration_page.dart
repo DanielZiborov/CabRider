@@ -19,15 +19,14 @@ class RegistrationPage extends StatelessWidget {
   final passwordController = TextEditingController();
 
   void registerUser() async {
-    final user = (await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: emailController.text,
-      password: passwordController.text,
-    ))
-        .user;
-    if (user != null) {
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+      log("SUCCESS");
+    } catch (e) {
       log("ERROR");
-    } else {
-      log("Success");
     }
   }
 
@@ -166,12 +165,7 @@ class RegistrationPage extends StatelessWidget {
                             showError(context, "Invalid email");
                             return;
                           }
-
-                          try {
-                            registerUser();
-                          } catch (e) {
-                            showError(context,"ERROR");
-                          }
+                          registerUser();
                         },
                       ),
                     ],
