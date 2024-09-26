@@ -43,6 +43,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
       PlatformException thisEx = ex;
       showError(thisEx.message.toString());
+      return ex;
     }))
         .user;
 
@@ -185,17 +186,17 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           var connectivityResult =
                               await Connectivity().checkConnectivity();
 
-                          if (connectivityResult
-                                  .contains(ConnectivityResult.mobile) ||
-                              connectivityResult
+                          if (!connectivityResult
+                                  .contains(ConnectivityResult.mobile) &
+                              !connectivityResult
                                   .contains(ConnectivityResult.wifi)) {
-                                    showError("no internet connectivity");
-                                    return;
-                                  }
+                            showError("no internet connectivity");
+                            return;
+                          }
 
                           //check my problems
                           if (fullNameController.text.length < 3) {
-                            showError("Invalid  Full Name");
+                            showError("Invalid Full Name");
                             return;
                           }
                           if (phoneController.text.length < 10) {
