@@ -30,8 +30,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   final _auth = FirebaseAuth.instance;
 
-  final user = null;
-
   void registerUser() async {
     final user = (await _auth
             .createUserWithEmailAndPassword(
