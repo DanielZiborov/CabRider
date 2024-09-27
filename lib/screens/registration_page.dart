@@ -1,6 +1,7 @@
 import 'package:cab_rider/brand_colors.dart';
 import 'package:cab_rider/screens/login_page.dart';
 import 'package:cab_rider/screens/main_page.dart';
+import 'package:cab_rider/widgets/progress_dialog.dart';
 import 'package:cab_rider/widgets/taxi_button.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -31,6 +32,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final _auth = FirebaseAuth.instance;
 
   void registerUser() async {
+
+    //show please wait dialog
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => const ProgressDialog(status: "Registering you..."),
+    );
+
     final user = (await _auth
             .createUserWithEmailAndPassword(
       email: emailController.text,
@@ -38,12 +47,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
     )
             .catchError((ex) {
       //check errors and display messages
-
+      Navigator.pop(context);
       PlatformException thisEx = ex;
       showError(thisEx.message.toString());
-      return ex;
     }))
         .user;
+
+    Navigator.pop(context);
 
     if (user != null) {
       DatabaseReference newUserRef =

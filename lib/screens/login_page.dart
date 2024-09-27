@@ -1,6 +1,7 @@
 import 'package:cab_rider/brand_colors.dart';
 import 'package:cab_rider/screens/main_page.dart';
 import 'package:cab_rider/screens/registration_page.dart';
+import 'package:cab_rider/widgets/progress_dialog.dart';
 import 'package:cab_rider/widgets/taxi_button.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -42,15 +43,22 @@ class _LoginPageState extends State<LoginPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   void login() async {
+    //show please wait dialog
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context)=> const ProgressDialog(status: "Loggin you in"),
+    );
+
     final user = (await _auth
             .signInWithEmailAndPassword(
       email: emailController.text,
       password: passwordController.text,
     )
             .catchError((ex) {
+      Navigator.pop(context);
       PlatformException thisEx = ex;
       showError(thisEx.message.toString());
-      return ex;
     }))
         .user;
 
