@@ -7,7 +7,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 final _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -32,7 +31,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final _auth = FirebaseAuth.instance;
 
   void registerUser() async {
-
     //show please wait dialog
     showDialog(
       barrierDismissible: false,
@@ -48,8 +46,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
             .catchError((ex) {
       //check errors and display messages
       Navigator.pop(context);
-      PlatformException thisEx = ex;
-      showError(thisEx.message.toString());
+      if (ex.runtimeType == FirebaseAuthException) {
+        FirebaseAuthException thisEx = ex;
+        showError(thisEx.message.toString());
+      }
+      else {
+        showError("Unknown error");
+      }
     }))
         .user;
 
@@ -64,12 +67,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
         "phone": phoneController.text,
       };
       newUserRef.set(userMap);
-      transitionMainPage();
+      Navigator.pushNamedAndRemoveUntil(context, MainPage.id, (route) => false);
     }
-  }
-
-  void transitionMainPage() {
-    Navigator.pushNamedAndRemoveUntil(context, MainPage.id, (route) => false);
   }
 
   void showError(String title) {

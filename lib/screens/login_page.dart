@@ -7,7 +7,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 final _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -47,7 +46,7 @@ class _LoginPageState extends State<LoginPage> {
     showDialog(
       barrierDismissible: false,
       context: context,
-      builder: (context)=> const ProgressDialog(status: "Loggin you in"),
+      builder: (context) => const ProgressDialog(status: "Loggin you in"),
     );
 
     final user = (await _auth
@@ -57,8 +56,12 @@ class _LoginPageState extends State<LoginPage> {
     )
             .catchError((ex) {
       Navigator.pop(context);
-      PlatformException thisEx = ex;
-      showError(thisEx.message.toString());
+      if (ex.runtimeType == FirebaseAuthException) {
+        FirebaseAuthException thisEx = ex;
+        showError(thisEx.message.toString());
+      } else {
+        showError("Unknown error");
+      }
     }))
         .user;
 
