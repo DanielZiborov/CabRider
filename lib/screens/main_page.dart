@@ -16,7 +16,10 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('OpenStreetMap')),
+      appBar: AppBar(
+        title: const Text('OpenStreetMap'),
+        centerTitle: true,
+      ),
       body: FlutterMap(
         options: const MapOptions(
           initialCenter:
